@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dat Kafe — Cà phê rang xay nguyên chất</title>
+<meta name="description" content="Dat Kafe - cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam. Mua online, giao tận nơi." />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <nav class="nav-links">
+      <a href="index.html" class="active">Trang chủ</a>
+      <a href="products.html">Sản phẩm</a>
+      <a href="about.html">Về chúng tôi</a>
+      <a href="index.html#contact">Liên hệ</a>
+      <a href="cart.html" class="cart-link">🛒 Giỏ hàng <span class="cart-count">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <h1>Cà phê rang xay nguyên chất, từ nông trại đến tách cà phê của bạn</h1>
+    <p>Dat Kafe tuyển chọn hạt cà phê Arabica &amp; Robusta từ Cầu Đất, Buôn Mê Thuột — rang thủ công theo mẻ nhỏ, giữ trọn hương vị Việt Nam.</p>
+    <a href="products.html" class="btn">Mua cà phê ngay</a>
+    <a href="about.html" class="btn btn-outline" style="margin-left:12px;">Câu chuyện của chúng tôi</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Sản phẩm nổi bật</h2>
+    <p class="section-subtitle">Những dòng cà phê được khách hàng của Dat Kafe yêu thích nhất</p>
+    <div class="product-grid" id="featured-products"></div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Vì sao chọn Dat Kafe</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="icon">🌱</div>
+        <h3>Nguyên liệu chọn lọc</h3>
+        <p>Thu hái quả chín từ các vùng trồng cà phê nổi tiếng Việt Nam như Cầu Đất, Buôn Mê Thuột.</p>
+      </div>
+      <div class="value-card">
+        <div class="icon">🔥</div>
+        <h3>Rang thủ công từng mẻ</h3>
+        <p>Rang mẻ nhỏ, kiểm soát nhiệt độ chặt chẽ để giữ trọn hương thơm và vị nguyên bản.</p>
+      </div>
+      <div class="value-card">
+        <div class="icon">🚚</div>
+        <h3>Giao hàng tận nơi</h3>
+        <p>Đặt hàng online, thanh toán an toàn, giao nhanh trên toàn quốc.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="container" style="text-align:center;">
+    <h2 class="section-title">Ghé thăm hoặc liên hệ với chúng tôi</h2>
+    <p class="section-subtitle">Email: da.tkaferoastery@gmail.com — chúng tôi luôn sẵn sàng tư vấn loại cà phê phù hợp với bạn.</p>
+    <a href="products.html" class="btn">Xem tất cả sản phẩm</a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <h4>☕ Dat Kafe</h4>
+      <p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam. Từ nông trại đến tách cà phê của bạn.</p>
+    </div>
+    <div>
+      <h4>Liên kết</h4>
+      <ul>
+        <li><a href="products.html">Sản phẩm</a></li>
+        <li><a href="about.html">Câu chuyện Dat Kafe</a></li>
+        <li><a href="cart.html">Giỏ hàng</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Liên hệ</h4>
+      <ul>
+        <li>Email: da.tkaferoastery@gmail.com</li>
+        <li>Điện thoại: (cập nhật số điện thoại)</li>
+        <li>Địa chỉ: (cập nhật địa chỉ quán)</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
+</footer>
+
+<script src="js/cart-utils.js"></script>
+<script>
+const ICONS = {
+  "Cà phê rang xay": "☕",
+  "Dụng cụ pha chế": "🫖",
+  "Cà phê viên nén": "🔘",
+  "Cà phê túi lọc": "🍵",
+  "Cà phê nguyên hạt": "🫘"
+};
+
+fetch('/api/products?featured=true')
+  .then(r => r.json())
+  .then(products => {
+    const grid = document.getElementById('featured-products');
+    grid.innerHTML = products.map(p => `
+      <div class="product-card">
+        <div class="product-thumb">
+          ${p.oldPrice ? '<span class="badge">Giảm giá</span>' : ''}
+          ${ICONS[p.category] || '☕'}
+        </div>
+        <div class="product-body">
+          <h3>${p.name}</h3>
+          <div class="product-origin">${p.origin}</div>
+          <div class="product-desc">${p.shortDesc}</div>
+          <div class="price-row">
+            <span class="price">${p.price.toLocaleString('vi-VN')}₫</span>
+            ${p.oldPrice ? `<span class="old-price">${p.oldPrice.toLocaleString('vi-VN')}₫</span>` : ''}
+          </div>
+          <div class="product-actions">
+            <a href="product-detail.html?id=${p.id}" class="btn btn-block">Xem chi tiết</a>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  })
+  .catch(() => {
+    document.getElementById('featured-products').innerHTML = '<p>Không tải được sản phẩm. Vui lòng khởi động server trước (xem README).</p>';
+  });
+</script>
+</body>
+</html>

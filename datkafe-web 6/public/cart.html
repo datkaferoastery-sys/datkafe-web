@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Giỏ hàng — Dat Kafe</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <nav class="nav-links">
+      <a href="index.html">Trang chủ</a>
+      <a href="products.html">Sản phẩm</a>
+      <a href="about.html">Về chúng tôi</a>
+      <a href="index.html#contact">Liên hệ</a>
+      <a href="cart.html" class="cart-link active">🛒 Giỏ hàng <span class="cart-count">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Giỏ hàng của bạn</h2>
+    <div id="cart-content">Đang tải...</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h4>☕ Dat Kafe</h4><p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam.</p></div>
+    <div><h4>Liên kết</h4><ul><li><a href="products.html">Sản phẩm</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
+    <div><h4>Liên hệ</h4><ul><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
+  </div>
+  <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
+</footer>
+
+<script src="js/cart-utils.js"></script>
+<script>
+const ICONS = {
+  "Cà phê rang xay": "☕", "Dụng cụ pha chế": "🫖", "Cà phê viên nén": "🔘",
+  "Cà phê túi lọc": "🍵", "Cà phê nguyên hạt": "🫘"
+};
+
+function renderCart() {
+  const cart = getCart();
+  const container = document.getElementById('cart-content');
+
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="empty-state"><p>Giỏ hàng của bạn đang trống.</p><a href="products.html" class="btn">Mua sắm ngay</a></div>`;
+    return;
+  }
+
+  fetch('/api/products')
+    .then(r => r.json())
+    .then(products => {
+      let total = 0;
+      const rows = cart.map(item => {
+        const p = products.find(pp => pp.id === item.id);
+        if (!p) return '';
+        const lineTotal = p.price * item.qty;
+        total += lineTotal;
+        return `
+          <tr>
+            <td>
+              <div class="cart-item-row">
+                <div class="cart-item-thumb">${ICONS[p.category] || '☕'}</div>
+                <div>
+                  <div class="cart-item-name">${p.name}</div>
+                  <div class="product-origin">${p.unit}</div>
+                </div>
+              </div>
+            </td>
+            <td>${p.price.toLocaleString('vi-VN')}₫</td>
+            <td>
+              <input type="number" min="1" value="${item.qty}" style="width:60px; padding:6px;" data-id="${p.id}" class="qty-field" />
+            </td>
+            <td>${lineTotal.toLocaleString('vi-VN')}₫</td>
+            <td><button class="remove-btn" data-id="${p.id}">Xóa</button></td>
+          </tr>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <table class="cart-table">
+          <thead><tr><th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="cart-summary">
+          <div class="summary-row"><span>Tạm tính</span><span>${total.toLocaleString('vi-VN')}₫</span></div>
+          <div class="summary-row"><span>Phí vận chuyển</span><span>Tính khi thanh toán</span></div>
+          <div class="summary-row summary-total"><span>Tổng cộng</span><span>${total.toLocaleString('vi-VN')}₫</span></div>
+          <a href="checkout.html" class="btn btn-block" style="margin-top:16px;">Tiến hành thanh toán</a>
+        </div>
+      `;
+
+      document.querySelectorAll('.qty-field').forEach(input => {
+        input.addEventListener('change', () => {
+          updateCartQty(input.dataset.id, parseInt(input.value || 1));
+          renderCart();
+        });
+      });
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          removeFromCart(btn.dataset.id);
+          renderCart();
+        });
+      });
+    });
+}
+
+renderCart();
+</script>
+</body>
+</html>

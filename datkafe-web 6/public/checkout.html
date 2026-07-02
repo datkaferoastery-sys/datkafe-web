@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Thanh toán — Dat Kafe</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <nav class="nav-links">
+      <a href="index.html">Trang chủ</a>
+      <a href="products.html">Sản phẩm</a>
+      <a href="about.html">Về chúng tôi</a>
+      <a href="index.html#contact">Liên hệ</a>
+      <a href="cart.html" class="cart-link">🛒 Giỏ hàng <span class="cart-count">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container" style="max-width:640px;">
+    <h2 class="section-title">Thông tin đặt hàng</h2>
+    <div id="checkout-alert"></div>
+    <form id="checkout-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="name">Họ và tên *</label>
+          <input type="text" id="name" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Số điện thoại *</label>
+          <input type="tel" id="phone" required />
+        </div>
+        <div class="form-group full-width">
+          <label for="email">Email</label>
+          <input type="email" id="email" />
+        </div>
+        <div class="form-group full-width">
+          <label for="address">Địa chỉ giao hàng *</label>
+          <input type="text" id="address" required />
+        </div>
+        <div class="form-group full-width">
+          <label for="note">Ghi chú</label>
+          <textarea id="note" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="cart-summary" style="margin-left:0; max-width:none;" id="order-summary">Đang tải giỏ hàng...</div>
+
+      <button type="submit" class="btn btn-block" style="margin-top:20px;" id="submit-btn">Thanh toán qua VNPay</button>
+      <p style="text-align:center; color:#8a7a6a; font-size:0.85rem; margin-top:10px;">Bạn sẽ được chuyển đến cổng thanh toán VNPay để hoàn tất giao dịch an toàn.</p>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h4>☕ Dat Kafe</h4><p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam.</p></div>
+    <div><h4>Liên kết</h4><ul><li><a href="products.html">Sản phẩm</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
+    <div><h4>Liên hệ</h4><ul><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
+  </div>
+  <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
+</footer>
+
+<script src="js/cart-utils.js"></script>
+<script>
+const cart = getCart();
+if (cart.length === 0) {
+  window.location.href = 'cart.html';
+}
+
+fetch('/api/products')
+  .then(r => r.json())
+  .then(products => {
+    let total = 0;
+    const rows = cart.map(item => {
+      const p = products.find(pp => pp.id === item.id);
+      if (!p) return '';
+      const lineTotal = p.price * item.qty;
+      total += lineTotal;
+      return `<div class="summary-row"><span>${p.name} × ${item.qty}</span><span>${lineTotal.toLocaleString('vi-VN')}₫</span></div>`;
+    }).join('');
+    document.getElementById('order-summary').innerHTML = `
+      ${rows}
+      <div class="summary-row summary-total"><span>Tổng cộng</span><span>${total.toLocaleString('vi-VN')}₫</span></div>
+    `;
+  });
+
+document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  const alertBox = document.getElementById('checkout-alert');
+  alertBox.innerHTML = '';
+  btn.disabled = true;
+  btn.textContent = 'Đang xử lý...';
+
+  const customer = {
+    name: document.getElementById('name').value,
+    phone: document.getElementById('phone').value,
+    email: document.getElementById('email').value,
+    address: document.getElementById('address').value,
+    note: document.getElementById('note').value,
+  };
+
+  try {
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: getCart(), customer }),
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      alertBox.innerHTML = `<div class="alert alert-error">${data.error || 'Có lỗi xảy ra, vui lòng thử lại.'}</div>`;
+      btn.disabled = false;
+      btn.textContent = 'Thanh toán qua VNPay';
+      return;
+    }
+
+    // Chuyen huong sang cong thanh toan VNPay
+    window.location.href = data.paymentUrl;
+  } catch (err) {
+    alertBox.innerHTML = `<div class="alert alert-error">Không kết nối được máy chủ. Vui lòng thử lại.</div>`;
+    btn.disabled = false;
+    btn.textContent = 'Thanh toán qua VNPay';
+  }
+});
+</script>
+</body>
+</html>

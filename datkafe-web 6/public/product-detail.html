@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chi tiết sản phẩm — Dat Kafe</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <nav class="nav-links">
+      <a href="index.html">Trang chủ</a>
+      <a href="products.html" class="active">Sản phẩm</a>
+      <a href="about.html">Về chúng tôi</a>
+      <a href="index.html#contact">Liên hệ</a>
+      <a href="cart.html" class="cart-link">🛒 Giỏ hàng <span class="cart-count">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div id="product-content">Đang tải...</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h4>☕ Dat Kafe</h4><p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam.</p></div>
+    <div><h4>Liên kết</h4><ul><li><a href="products.html">Sản phẩm</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
+    <div><h4>Liên hệ</h4><ul><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
+  </div>
+  <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
+</footer>
+
+<script src="js/cart-utils.js"></script>
+<script>
+const ICONS = {
+  "Cà phê rang xay": "☕", "Dụng cụ pha chế": "🫖", "Cà phê viên nén": "🔘",
+  "Cà phê túi lọc": "🍵", "Cà phê nguyên hạt": "🫘"
+};
+
+const params = new URLSearchParams(location.search);
+const id = params.get('id');
+
+fetch(`/api/products/${id}`)
+  .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
+  .then(p => {
+    document.title = `${p.name} — Dat Kafe`;
+    document.getElementById('product-content').innerHTML = `
+      <div class="product-detail">
+        <div class="product-detail-thumb">${ICONS[p.category] || '☕'}</div>
+        <div>
+          <h1>${p.name}</h1>
+          <div class="product-origin">${p.origin}</div>
+          <div class="price-row" style="margin:16px 0;">
+            <span class="price" style="font-size:1.5rem;">${p.price.toLocaleString('vi-VN')}₫</span>
+            ${p.oldPrice ? `<span class="old-price">${p.oldPrice.toLocaleString('vi-VN')}₫</span>` : ''}
+          </div>
+          <p>${p.description}</p>
+          <ul class="meta-list">
+            <li><strong>Danh mục:</strong> ${p.category}</li>
+            ${p.roast ? `<li><strong>Độ rang:</strong> ${p.roast}</li>` : ''}
+            <li><strong>Quy cách:</strong> ${p.unit}</li>
+          </ul>
+          <div class="qty-selector">
+            <button id="qty-minus">−</button>
+            <input type="number" id="qty-input" value="1" min="1" />
+            <button id="qty-plus">+</button>
+          </div>
+          <button class="btn" id="add-to-cart-btn">Thêm vào giỏ hàng</button>
+          <a href="cart.html" class="btn btn-outline" style="margin-left:10px; border-color:#6f4e37; color:#3c2415;" id="go-cart-link">Xem giỏ hàng</a>
+        </div>
+      </div>
+    `;
+
+    const qtyInput = document.getElementById('qty-input');
+    document.getElementById('qty-minus').addEventListener('click', () => {
+      qtyInput.value = Math.max(1, parseInt(qtyInput.value || 1) - 1);
+    });
+    document.getElementById('qty-plus').addEventListener('click', () => {
+      qtyInput.value = parseInt(qtyInput.value || 1) + 1;
+    });
+    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+      addToCart(p.id, parseInt(qtyInput.value || 1));
+      document.getElementById('add-to-cart-btn').textContent = 'Đã thêm ✓';
+      setTimeout(() => { document.getElementById('add-to-cart-btn').textContent = 'Thêm vào giỏ hàng'; }, 1500);
+    });
+  })
+  .catch(() => {
+    document.getElementById('product-content').innerHTML = '<p>Không tìm thấy sản phẩm. <a href="products.html">Quay lại danh sách sản phẩm</a></p>';
+  });
+</script>
+</body>
+</html>

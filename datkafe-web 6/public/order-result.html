@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kết quả đặt hàng — Dat Kafe</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <nav class="nav-links">
+      <a href="index.html">Trang chủ</a>
+      <a href="products.html">Sản phẩm</a>
+      <a href="about.html">Về chúng tôi</a>
+      <a href="index.html#contact">Liên hệ</a>
+      <a href="cart.html" class="cart-link">🛒 Giỏ hàng <span class="cart-count">0</span></a>
+    </nav>
+  </div>
+</header>
+
+<div class="result-box" id="result-box">Đang kiểm tra kết quả thanh toán...</div>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><h4>☕ Dat Kafe</h4><p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam.</p></div>
+    <div><h4>Liên kết</h4><ul><li><a href="products.html">Sản phẩm</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
+    <div><h4>Liên hệ</h4><ul><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
+  </div>
+  <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
+</footer>
+
+<script src="js/cart-utils.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const status = params.get('status');
+const orderId = params.get('orderId');
+const box = document.getElementById('result-box');
+
+const messages = {
+  success: { icon: '✅', title: 'Đặt hàng thành công!', text: 'Cảm ơn bạn đã mua hàng tại Dat Kafe. Đơn hàng của bạn đang được xử lý.', clearCart: true },
+  failed: { icon: '❌', title: 'Thanh toán không thành công', text: 'Giao dịch của bạn chưa hoàn tất. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.', clearCart: false },
+  invalid: { icon: '⚠️', title: 'Dữ liệu không hợp lệ', text: 'Không thể xác thực thông tin thanh toán. Vui lòng liên hệ Dat Kafe nếu bạn đã bị trừ tiền.', clearCart: false },
+  error: { icon: '⚠️', title: 'Có lỗi xảy ra', text: 'Vui lòng thử lại sau hoặc liên hệ Dat Kafe để được hỗ trợ.', clearCart: false },
+};
+
+const m = messages[status] || messages.error;
+
+box.innerHTML = `
+  <div class="result-icon">${m.icon}</div>
+  <h2>${m.title}</h2>
+  <p>${m.text}</p>
+  ${orderId ? `<p style="color:#8a7a6a;">Mã đơn hàng: <strong>${orderId}</strong></p>` : ''}
+  <a href="products.html" class="btn" style="margin-top:16px;">Tiếp tục mua sắm</a>
+`;
+
+if (m.clearCart) clearCart();
+</script>
+</body>
+</html>
