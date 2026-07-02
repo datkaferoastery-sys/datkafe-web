@@ -69,8 +69,8 @@ let allProducts = [];
 function render(list) {
   const grid = document.getElementById('product-list');
   if (list.length === 0) { grid.innerHTML = '<p>Không có sản phẩm.</p>'; return; }
-  grid.innerHTML = list.map(p => `
-    <div class="product-card">
+  grid.innerHTML = list.map((p, i) => `
+    <div class="product-card card-in" style="animation-delay:${i * 0.05}s">
       <div class="product-thumb">
         ${p.oldPrice ? '<span class="badge">Giảm giá</span>' : ''}
         ${ICONS[p.category] || '☕'}
@@ -105,5 +105,6 @@ document.querySelectorAll('[data-filter]').forEach(btn => {
   });
 });
 </script>
+<script src="js/reveal.js"></script>
 </body>
 </html>
