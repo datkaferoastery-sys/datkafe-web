@@ -33,9 +33,9 @@ function getClientIp(req) {
 
 /**
  * POST /api/checkout
- * body: { items: [{ id, qty }], customer: { name, phone, email, address, note } }
+ * body: { items: [{ id, size, qty }], customer: { name, phone, email, address, note } }
  *
- * QUAN TRONG: gia tien luon duoc tinh lai tu products.json o server,
+ * QUAN TRONG: gia tien luon duoc tinh lai tu products.json o server dua tren id + size,
  * KHONG bao gio tin tuong gia gui len tu trinh duyet.
  */
 router.post('/checkout', (req, res) => {
@@ -63,9 +63,13 @@ router.post('/checkout', (req, res) => {
       if (!product) {
         return res.status(400).json({ error: `San pham khong ton tai: ${item.id}` });
       }
+      const sizeObj = (product.sizes || []).find((s) => s.label === item.size);
+      if (!sizeObj) {
+        return res.status(400).json({ error: `Size khong hop le cho san pham: ${product.name}` });
+      }
       const qty = Math.max(1, parseInt(item.qty, 10) || 1);
-      amount += product.price * qty;
-      lineItems.push({ id: product.id, name: product.name, price: product.price, qty });
+      amount += sizeObj.price * qty;
+      lineItems.push({ id: product.id, name: product.name, size: sizeObj.label, price: sizeObj.price, qty });
     }
 
     const orderId = `DK${Date.now()}${crypto.randomInt(100, 999)}`;

@@ -4,13 +4,16 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chi tiết sản phẩm — Dat Kafe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <header class="site-header">
   <div class="container">
-    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <a href="index.html" class="logo"><span class="logo-dat">Dat</span><span class="logo-kafe">Kafe</span></a>
     <nav class="nav-links">
       <a href="index.html">Trang chủ</a>
       <a href="products.html" class="active">Sản phẩm</a>
@@ -29,55 +32,74 @@
 
 <footer class="site-footer">
   <div class="container footer-grid">
-    <div><h4>☕ Dat Kafe</h4><p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam.</p></div>
-    <div><h4>Liên kết</h4><ul><li><a href="products.html">Sản phẩm</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
-    <div><h4>Liên hệ</h4><ul><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
+    <div><h4><span class="logo-dat">Dat</span> <span class="logo-kafe">Kafe</span></h4><p>Một ly cà phê đủ tốt — đúng lúc. Rang mới và đóng chai mỗi ngày.</p></div>
+    <div><h4>Liên kết</h4><ul><li><a href="products.html">Menu</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
+    <div><h4>Liên hệ</h4><ul><li>Hotline: 03 555 38388</li><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
   </div>
   <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
 </footer>
 
 <script src="js/cart-utils.js"></script>
 <script>
-const ICONS = {
-  "Cà phê rang xay": "☕", "Dụng cụ pha chế": "🫖", "Cà phê viên nén": "🔘",
-  "Cà phê túi lọc": "🍵", "Cà phê nguyên hạt": "🫘"
-};
+const ICONS = { "Basic Coffee": "☕", "Signature": "✨", "Cold Brew": "🧊" };
 
 const params = new URLSearchParams(location.search);
 const id = params.get('id');
+let selectedSize = null;
 
 fetch(`/api/products/${id}`)
   .then(r => { if (!r.ok) throw new Error('not found'); return r.json(); })
   .then(p => {
     document.title = `${p.name} — Dat Kafe`;
+    selectedSize = p.sizes[0].label;
+
+    function priceFor(sizeLabel) {
+      const s = p.sizes.find(sz => sz.label === sizeLabel);
+      return s ? s.price : p.sizes[0].price;
+    }
+
     document.getElementById('product-content').innerHTML = `
       <div class="product-detail">
         <div class="product-detail-thumb">${ICONS[p.category] || '☕'}</div>
         <div>
           <h1>${p.name}</h1>
-          <div class="product-origin">${p.origin}</div>
+          <div class="product-origin">${p.category}${p.base ? ' · ' + p.base : ''}</div>
           <div class="price-row" style="margin:16px 0;">
-            <span class="price" style="font-size:1.5rem;">${p.price.toLocaleString('vi-VN')}₫</span>
-            ${p.oldPrice ? `<span class="old-price">${p.oldPrice.toLocaleString('vi-VN')}₫</span>` : ''}
+            <span class="price" id="current-price" style="font-size:1.5rem;">${priceFor(selectedSize).toLocaleString('vi-VN')}₫</span>
           </div>
           <p>${p.description}</p>
           <ul class="meta-list">
             <li><strong>Danh mục:</strong> ${p.category}</li>
-            ${p.roast ? `<li><strong>Độ rang:</strong> ${p.roast}</li>` : ''}
-            <li><strong>Quy cách:</strong> ${p.unit}</li>
           </ul>
+          <div>
+            <strong style="display:block; margin-bottom:8px;">Chọn size:</strong>
+            <div style="display:flex; gap:10px;" id="size-selector">
+              ${p.sizes.map((s, i) => `<button type="button" class="btn btn-secondary size-btn" data-size="${s.label}" style="${i === 0 ? 'outline:2px solid var(--brown);' : ''}">${s.label} — ${s.price.toLocaleString('vi-VN')}₫</button>`).join('')}
+            </div>
+          </div>
           <div class="qty-selector">
             <button id="qty-minus">−</button>
             <input type="number" id="qty-input" value="1" min="1" />
             <button id="qty-plus">+</button>
           </div>
           <button class="btn" id="add-to-cart-btn">Thêm vào giỏ hàng</button>
-          <a href="cart.html" class="btn btn-outline" style="margin-left:10px; border-color:#6f4e37; color:#3c2415;" id="go-cart-link">Xem giỏ hàng</a>
+          <a href="cart.html" class="btn btn-outline" style="margin-left:10px; border-color:#7d0000; color:#2a0605;" id="go-cart-link">Xem giỏ hàng</a>
         </div>
       </div>
     `;
 
     const qtyInput = document.getElementById('qty-input');
+    const priceEl = document.getElementById('current-price');
+
+    document.querySelectorAll('.size-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedSize = btn.dataset.size;
+        document.querySelectorAll('.size-btn').forEach(b => b.style.outline = 'none');
+        btn.style.outline = '2px solid var(--brown)';
+        priceEl.textContent = priceFor(selectedSize).toLocaleString('vi-VN') + '₫';
+      });
+    });
+
     document.getElementById('qty-minus').addEventListener('click', () => {
       qtyInput.value = Math.max(1, parseInt(qtyInput.value || 1) - 1);
     });
@@ -85,13 +107,13 @@ fetch(`/api/products/${id}`)
       qtyInput.value = parseInt(qtyInput.value || 1) + 1;
     });
     document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-      addToCart(p.id, parseInt(qtyInput.value || 1));
+      addToCart(p.id, selectedSize, parseInt(qtyInput.value || 1));
       document.getElementById('add-to-cart-btn').textContent = 'Đã thêm ✓';
       setTimeout(() => { document.getElementById('add-to-cart-btn').textContent = 'Thêm vào giỏ hàng'; }, 1500);
     });
   })
   .catch(() => {
-    document.getElementById('product-content').innerHTML = '<p>Không tìm thấy sản phẩm. <a href="products.html">Quay lại danh sách sản phẩm</a></p>';
+    document.getElementById('product-content').innerHTML = '<p>Không tìm thấy sản phẩm. <a href="products.html">Quay lại menu</a></p>';
   });
 </script>
 <script src="js/reveal.js"></script>

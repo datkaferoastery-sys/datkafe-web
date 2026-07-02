@@ -4,13 +4,16 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sản phẩm — Dat Kafe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <header class="site-header">
   <div class="container">
-    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <a href="index.html" class="logo"><span class="logo-dat">Dat</span><span class="logo-kafe">Kafe</span></a>
     <nav class="nav-links">
       <a href="index.html">Trang chủ</a>
       <a href="products.html" class="active">Sản phẩm</a>
@@ -23,16 +26,14 @@
 
 <section class="section">
   <div class="container">
-    <h2 class="section-title">Tất cả sản phẩm</h2>
-    <p class="section-subtitle">Cà phê rang xay, nguyên hạt, viên nén và dụng cụ pha chế</p>
+    <h2 class="section-title">Menu Dat Kafe</h2>
+    <p class="section-subtitle">Basic Coffee, Signature và Cold Brew — rang mới, đóng chai mỗi ngày</p>
 
     <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:32px;">
       <button class="btn btn-secondary" data-filter="">Tất cả</button>
-      <button class="btn btn-secondary" data-filter="Cà phê rang xay">Cà phê rang xay</button>
-      <button class="btn btn-secondary" data-filter="Cà phê nguyên hạt">Nguyên hạt</button>
-      <button class="btn btn-secondary" data-filter="Cà phê viên nén">Viên nén</button>
-      <button class="btn btn-secondary" data-filter="Cà phê túi lọc">Túi lọc</button>
-      <button class="btn btn-secondary" data-filter="Dụng cụ pha chế">Dụng cụ pha chế</button>
+      <button class="btn btn-secondary" data-filter="Basic Coffee">Basic Coffee</button>
+      <button class="btn btn-secondary" data-filter="Signature">Signature</button>
+      <button class="btn btn-secondary" data-filter="Cold Brew">Cold Brew</button>
     </div>
 
     <div class="product-grid" id="product-list"></div>
@@ -42,16 +43,16 @@
 <footer class="site-footer">
   <div class="container footer-grid">
     <div>
-      <h4>☕ Dat Kafe</h4>
-      <p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam.</p>
+      <h4><span class="logo-dat">Dat</span> <span class="logo-kafe">Kafe</span></h4>
+      <p>Một ly cà phê đủ tốt — đúng lúc. Rang mới và đóng chai mỗi ngày.</p>
     </div>
     <div>
       <h4>Liên kết</h4>
-      <ul><li><a href="products.html">Sản phẩm</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul>
+      <ul><li><a href="products.html">Menu</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul>
     </div>
     <div>
       <h4>Liên hệ</h4>
-      <ul><li>Email: da.tkaferoastery@gmail.com</li></ul>
+      <ul><li>Hotline: 03 555 38388</li><li>Email: da.tkaferoastery@gmail.com</li></ul>
     </div>
   </div>
   <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
@@ -59,29 +60,30 @@
 
 <script src="js/cart-utils.js"></script>
 <script>
-const ICONS = {
-  "Cà phê rang xay": "☕", "Dụng cụ pha chế": "🫖", "Cà phê viên nén": "🔘",
-  "Cà phê túi lọc": "🍵", "Cà phê nguyên hạt": "🫘"
-};
+const ICONS = { "Basic Coffee": "☕", "Signature": "✨", "Cold Brew": "🧊" };
 
 let allProducts = [];
+
+function priceRangeLabel(p) {
+  const prices = p.sizes.map(s => s.price);
+  const min = Math.min(...prices), max = Math.max(...prices);
+  return min === max
+    ? `${min.toLocaleString('vi-VN')}₫`
+    : `${min.toLocaleString('vi-VN')}₫ - ${max.toLocaleString('vi-VN')}₫`;
+}
 
 function render(list) {
   const grid = document.getElementById('product-list');
   if (list.length === 0) { grid.innerHTML = '<p>Không có sản phẩm.</p>'; return; }
   grid.innerHTML = list.map((p, i) => `
     <div class="product-card card-in" style="animation-delay:${i * 0.05}s">
-      <div class="product-thumb">
-        ${p.oldPrice ? '<span class="badge">Giảm giá</span>' : ''}
-        ${ICONS[p.category] || '☕'}
-      </div>
+      <div class="product-thumb">${ICONS[p.category] || '☕'}</div>
       <div class="product-body">
         <h3>${p.name}</h3>
-        <div class="product-origin">${p.origin}</div>
+        <div class="product-origin">${p.category}</div>
         <div class="product-desc">${p.shortDesc}</div>
         <div class="price-row">
-          <span class="price">${p.price.toLocaleString('vi-VN')}₫</span>
-          ${p.oldPrice ? `<span class="old-price">${p.oldPrice.toLocaleString('vi-VN')}₫</span>` : ''}
+          <span class="price">${priceRangeLabel(p)}</span>
         </div>
         <div class="product-actions">
           <a href="product-detail.html?id=${p.id}" class="btn btn-block">Xem chi tiết</a>

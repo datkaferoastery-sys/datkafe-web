@@ -4,13 +4,16 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Thanh toán — Dat Kafe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <header class="site-header">
   <div class="container">
-    <a href="index.html" class="logo"><span class="cup">☕</span> Dat Kafe</a>
+    <a href="index.html" class="logo"><span class="logo-dat">Dat</span><span class="logo-kafe">Kafe</span></a>
     <nav class="nav-links">
       <a href="index.html">Trang chủ</a>
       <a href="products.html">Sản phẩm</a>
@@ -59,9 +62,9 @@
 
 <footer class="site-footer">
   <div class="container footer-grid">
-    <div><h4>☕ Dat Kafe</h4><p>Cà phê rang xay thủ công, nguyên chất từ vùng nguyên liệu Việt Nam.</p></div>
-    <div><h4>Liên kết</h4><ul><li><a href="products.html">Sản phẩm</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
-    <div><h4>Liên hệ</h4><ul><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
+    <div><h4><span class="logo-dat">Dat</span> <span class="logo-kafe">Kafe</span></h4><p>Một ly cà phê đủ tốt — đúng lúc. Rang mới và đóng chai mỗi ngày.</p></div>
+    <div><h4>Liên kết</h4><ul><li><a href="products.html">Menu</a></li><li><a href="about.html">Câu chuyện Dat Kafe</a></li><li><a href="cart.html">Giỏ hàng</a></li></ul></div>
+    <div><h4>Liên hệ</h4><ul><li>Hotline: 03 555 38388</li><li>Email: da.tkaferoastery@gmail.com</li></ul></div>
   </div>
   <div class="footer-bottom">© 2026 Dat Kafe. Đã đăng ký bản quyền.</div>
 </footer>
@@ -80,9 +83,10 @@ fetch('/api/products')
     const rows = cart.map(item => {
       const p = products.find(pp => pp.id === item.id);
       if (!p) return '';
-      const lineTotal = p.price * item.qty;
+      const sizeObj = p.sizes.find(s => s.label === item.size) || p.sizes[0];
+      const lineTotal = sizeObj.price * item.qty;
       total += lineTotal;
-      return `<div class="summary-row"><span>${p.name} × ${item.qty}</span><span>${lineTotal.toLocaleString('vi-VN')}₫</span></div>`;
+      return `<div class="summary-row"><span>${p.name} (${sizeObj.label}) × ${item.qty}</span><span>${lineTotal.toLocaleString('vi-VN')}₫</span></div>`;
     }).join('');
     document.getElementById('order-summary').innerHTML = `
       ${rows}

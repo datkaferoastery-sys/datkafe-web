@@ -1,24 +1,31 @@
 :root {
-  --brown-dark: #3c2415;
-  --brown: #6f4e37;
-  --brown-light: #a9805f;
-  --cream: #f7efe4;
-  --cream-dark: #eaddc7;
-  --gold: #c8963e;
-  --text: #3a2c22;
-  --white: #fffdf9;
-  --radius: 10px;
-  --shadow: 0 4px 16px rgba(60, 36, 21, 0.12);
+  /* Bo mau thuong hieu chinh thuc Dat Kafe (theo file branding) */
+  --brown-dark: #2a0605;   /* mau toi chinh - logo, header, text dam */
+  --brown: #7d0000;        /* mau do/maroon chinh - nut bam, diem nhan */
+  --brown-light: #a8524a;  /* sac phu, chu mo ta */
+  --cream: #fff2d3;        /* mau nen sang chu dao */
+  --cream-dark: #f5e1af;   /* nen the/card phu */
+  --gold: #7d0000;         /* dung lai mau do lam diem nhan thay vang */
+  --text: #2a0605;
+  --white: #ffffff;
+  --radius: 14px;
+  --shadow: 0 6px 20px rgba(42, 6, 5, 0.14);
+  --font-headline: "Baloo 2", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: "Georgia", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-body);
   background: var(--cream);
   color: var(--text);
   line-height: 1.6;
+}
+
+h1, h2, h3, .logo, .btn, .section-title, .price, .blog-tag {
+  font-family: var(--font-headline);
 }
 
 a { color: inherit; text-decoration: none; }
@@ -50,14 +57,16 @@ img { max-width: 100%; display: block; }
 
 .logo {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.4rem;
-  font-weight: bold;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 1.5rem;
+  font-weight: 800;
   letter-spacing: 0.5px;
   color: var(--cream);
 }
 
+.logo .logo-dat { color: var(--cream); }
+.logo .logo-kafe { color: #e8b7a0; margin-left: 4px; }
 .logo .cup { font-size: 1.6rem; }
 
 .nav-links {
@@ -139,6 +148,9 @@ img { max-width: 100%; display: block; }
 }
 
 .btn-outline:hover { background: var(--cream); color: var(--brown-dark); }
+
+.hero .btn { background: var(--cream); color: var(--brown-dark); }
+.hero .btn:hover { background: #ffffff; }
 
 .btn-block { width: 100%; text-align: center; }
 
